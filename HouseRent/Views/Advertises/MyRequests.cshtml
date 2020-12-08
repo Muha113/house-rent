@@ -1,0 +1,149 @@
+﻿@model Dictionary<string, Dictionary<string, List<HouseRent.Models.AdvertiseRequest>>>
+@using System
+@using Microsoft.AspNetCore.Http
+
+@{
+    ViewData["Title"] = "My Requests";
+}
+
+<div>
+    @foreach (var item in Model)
+    {
+        string type;
+        bool isToReplace;
+        if (item.Key == AdvertiseRequest.RequestToPlace)
+        {
+            type = "Запрос на размещение";
+            isToReplace = true;
+        }
+        else
+        {
+            type = "Запрос на бронь";
+            isToReplace = false;
+        }
+
+        <h2>@type</h2>
+
+        foreach (var adv in item.Value)
+        {
+            <p>@adv.Key</p>
+
+            <table class="table">
+                <thead>
+                    @*<tr>
+                        <th>
+                            @Html.DisplayNameFor(model => model)
+                        </th>
+                        <th>
+                            @Html.DisplayNameFor(model => model.Adv.FlatType)
+                        </th>
+                        <th>
+                            @Html.DisplayNameFor(model => model.Adv.Category)
+                        </th>
+                        <th>
+                            @Html.DisplayNameFor(model => model.Adv.Rent)
+                        </th>
+                        <th>
+                            @Html.DisplayNameFor(model => model.Adv.FlatDetails)
+                        </th>
+                        <th>
+                            @Html.DisplayNameFor(model => model.Adv.ConfirmationStatus)
+                        </th>
+                        <th></th>
+                    </tr>*@
+                </thead>
+                <tbody>
+                    @foreach (var i in adv.Value)
+                    {
+                    <tr>
+                        <td>
+                            @Html.DisplayFor(modelItem => i.Adv.Address)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => i.Adv.FlatType)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => i.Adv.Category)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => i.Adv.Rent)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => i.Adv.FlatDetails)
+                        </td>
+                        <td>
+                            <form asp-action="ChangeConfirmationStatus">
+                                <p>
+                                    @if (adv.Key == AdvertiseRequest.RequestOrderTo)
+                                    {
+                                        string tmpStatus;
+                                        if (isToReplace)
+                                        {
+                                            tmpStatus = i.Adv.ConfirmationStatus;
+                                        }
+                                        else
+                                        {
+                                            tmpStatus = i.Status;
+                                        }
+
+                                        <select name="Status">
+                                            @foreach (var x in ViewBag.StatusArray)
+                                            {
+                                                if (tmpStatus == x)
+                                                {
+                                                    <option selected value="@x">@x</option>
+                                                }
+                                                else
+                                                {
+                                                    <option value="@x">@x</option>
+                                                }
+                                            }
+
+                                        </select>
+                                    }
+                                    else
+                                    {
+                                        string tmpStatus;
+                                        if (isToReplace)
+                                        {
+                                            tmpStatus = i.Adv.ConfirmationStatus;
+                                        }
+                                        else
+                                        {
+                                            tmpStatus = i.Status;
+                                        }
+
+                                    <p>@tmpStatus</p>
+                                }
+
+                                    @if (isToReplace)
+                                    {
+                                        <input type="hidden" name="ID" value="@i.ID" />
+                                        <input type="hidden" name="AdvID" value="@i.AdvID" />
+                                        <input type="hidden" name="Type" value="ToPlace" />
+                                    }
+                                    else
+                                    {
+                                        <input type="hidden" name="ID" value="@i.ID" />
+                                        <input type="hidden" name="AdvID" value="@i.AdvID" />
+                                        <input type="hidden" name="Type" value="ToBook" />
+                                    }
+
+                                    @if (adv.Key == AdvertiseRequest.RequestOrderTo)
+                                    {
+                                        <input type="submit" value="Save">
+                                    }
+                                    </p>
+                                </form>
+                        </td>
+                        <td>
+                            <a asp-action="Details" asp-route-id="@i.AdvID">Details</a>
+                        </td>
+                    </tr>
+                    }
+
+                </tbody>
+            </table>
+        }
+    }
+</div>

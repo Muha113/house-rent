@@ -1,0 +1,78 @@
+﻿@{
+    ViewData["Title"] = "Welcome to House Rent Service";
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+* {
+    box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+}
+
+
+/* Create three equal columns that floats next to each other */
+.column {
+    float: left;
+    width: 50%;
+    padding: 15px;
+}
+
+.paragraph {
+    text-size-adjust: auto;
+
+}
+
+
+/* Clear floats after the columns */
+.row:after {
+    content: "";
+    display: table;
+    clear: both;
+}
+
+/* Responsive layout - makes the three columns stack on top of each other instead of next to each other */
+@@media screen and (max-width:600px) {
+    .column {
+        width: 100%;
+    }
+}
+    </style>
+</head>
+<body>
+    <img class="img-responsive" src="~/images/img.jpg"/>
+
+    <div class="alert alert-danger alert-dismissible fade in">
+        <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+        <marquee>
+            <font size="3">
+                Do not pay before you see the house by visiting it! Make your reservation right now!
+            </font>
+        </marquee>
+        
+    </div>
+    <div class="row">
+        <div class="column">
+            <img class="img-responsive" src="~/images/house.jpg" width="550" height="400">
+        </div>
+
+        <div class="column">
+            <h1>House Rent Service</h1>
+            <p class="paragraph">
+                Sometimes house rent goes beyond our range. Moreover students are hardly
+                to find a home for them, the owner of the home can be rude sometimes. Apart from this the
+                utility services can be found very poor in some case.
+                HouseRent is a project that is going to solve these problems.
+                We will try to create a user friendly website or application
+                which will manage problems of all categories' people and also save the time.
+            </p>
+        </div>
+    </div>
+
+</body>
+</html>

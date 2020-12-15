@@ -13,12 +13,12 @@
         bool isToReplace;
         if (item.Key == AdvertiseRequest.RequestToPlace)
         {
-            type = "Запрос на размещение";
+            type = "Accommodation request";
             isToReplace = true;
         }
         else
         {
-            type = "Запрос на бронь";
+            type = "Booking request";
             isToReplace = false;
         }
 
@@ -30,27 +30,6 @@
 
             <table class="table">
                 <thead>
-                    @*<tr>
-                        <th>
-                            @Html.DisplayNameFor(model => model)
-                        </th>
-                        <th>
-                            @Html.DisplayNameFor(model => model.Adv.FlatType)
-                        </th>
-                        <th>
-                            @Html.DisplayNameFor(model => model.Adv.Category)
-                        </th>
-                        <th>
-                            @Html.DisplayNameFor(model => model.Adv.Rent)
-                        </th>
-                        <th>
-                            @Html.DisplayNameFor(model => model.Adv.FlatDetails)
-                        </th>
-                        <th>
-                            @Html.DisplayNameFor(model => model.Adv.ConfirmationStatus)
-                        </th>
-                        <th></th>
-                    </tr>*@
                 </thead>
                 <tbody>
                     @foreach (var i in adv.Value)

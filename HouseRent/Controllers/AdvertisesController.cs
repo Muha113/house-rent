@@ -6,9 +6,9 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using HouseRent.Models;
-using System.IO;                    //*Directory
-using Microsoft.AspNetCore.Http;    //*IFormFile
-using Microsoft.AspNetCore.Hosting; //*get RootPath
+using System.IO;                    
+using Microsoft.AspNetCore.Http;    
+using Microsoft.AspNetCore.Hosting; 
 using HouseRent.Services;
 using Microsoft.Extensions.Configuration;
 
@@ -29,14 +29,12 @@ namespace HouseRent.Controllers
             _emailService = emailService;
         }
 
-        //A funtion to return image path from database
         public FileContentResult GetImg(int id)
         {
             var image = _context.Image.Find(id).FlatImage;
             return image != null ? new FileContentResult(image, "image/png") : null;
         }
 
-        //A function to make normal youtube link to embeded youtube link
         public string YTlink(string link)
         {
             if (link == null)
@@ -45,11 +43,11 @@ namespace HouseRent.Controllers
             {
                 int youtu = link.IndexOf("youtu.be");
                 
-                if (youtu != -1) // obiviously in youtu.be category
+                if (youtu != -1)
                 {
                     link = link.Substring(link.IndexOf("be/") + 3, 11);
                 }
-                else // in youtube.com category
+                else
                 {
                     link = link.Substring(link.IndexOf("?v=") + 3, 11);
                 }
@@ -58,7 +56,6 @@ namespace HouseRent.Controllers
             }
             catch
             {
-                //if given youtube link is not valid, it returns null 
                 return null;
             }
         }
@@ -76,7 +73,6 @@ namespace HouseRent.Controllers
                 Add = Add.Where(a => !RangesIntersects(a.RentRanges, rentFrom, rentTo));
             }
 
-            //now next values are rquared to check it is null or not
             if (!String.IsNullOrEmpty(area))
             {
                 Add = Add.Where(a => a.Address.Contains(area));
@@ -90,7 +86,6 @@ namespace HouseRent.Controllers
                 Add = Add.Where(c => c.Category.Contains(category));
             }
 
-            //rent need to convert into int type from string
             if (!String.IsNullOrEmpty(rent))
             {
                 int low = 1000 * Int32.Parse(rent.Substring(0, 2));
@@ -150,7 +145,6 @@ namespace HouseRent.Controllers
         public async Task<IActionResult> MyPosts()
         {
             string usermail = HttpContext.Session.GetString("sEmail");
-            //this means u cannot load myposts without being logged in
             if (String.IsNullOrEmpty(usermail))
             {
                 return RedirectToAction("Login", "Users");
@@ -165,15 +159,12 @@ namespace HouseRent.Controllers
         public async Task<IActionResult> Details(int? id)
         {
             string tempUser = HttpContext.Session.GetString("sEmail");
-            //this means u cannot load details without being logged in
             if (String.IsNullOrEmpty(tempUser))
             {
                 return RedirectToAction("Login", "Users");
             }
             else
             {
-                //if logged in, user exist or deleted!!
-
                 var userexist = await _context.User.SingleOrDefaultAsync(u => u.Email == tempUser);
                 if (userexist == null)
                 {
@@ -193,28 +184,23 @@ namespace HouseRent.Controllers
                 return NotFound();
             }
 
-            //that means normal youtube link converted to embeded youtube link
             advertise.YoutubeLink = YTlink(advertise.YoutubeLink);
 
-            //from image table we will get images
             var images = from i in _context.Image
                          where i.AdvertiseID == id
                          select i;
             advertise.Images = await images.ToListAsync();
 
-            //from comment table we will get comments
             var comments = from c in _context.Comment
                            where c.AdvertiseID == id
                            select c;
             advertise.Comments = await comments.ToListAsync();
 
-            //from review table we will get reviews
             var reviews = from r in _context.Review
                           where r.AdvertiseID == id
                           select r;
             advertise.Reviews = await reviews.ToListAsync();
 
-            //from compliments table we will get compliments
             var compliments = from c in _context.Compliment
                               where c.AdvertiseID == id
                               select c;
@@ -224,31 +210,26 @@ namespace HouseRent.Controllers
             return View(advertise);
         }
 
-        //this function is to review
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DoReview(Review review)
         {
             string usr = HttpContext.Session.GetString("sEmail");
-            //this means u cannot review without being logged in
             if (String.IsNullOrEmpty(usr))
             {
                 return RedirectToAction("Login", "Users");
             }
             review.Reviewer = usr;
 
-            //checking if user reviewed once or not...
             var Reviewed = await _context.Review.SingleOrDefaultAsync(r => r.Reviewer == usr && r.AdvertiseID == review.AdvertiseID);
 
             if (Reviewed == null)
             {
-                //if user reviewing for an advertise for the first time 
                 _context.Add(review);
                 await _context.SaveChangesAsync();
             }
             else
             {
-                //if already reviewed it, but want to change review
                 Reviewed.ReviewStar = review.ReviewStar;
                 _context.Update(Reviewed);
                 await _context.SaveChangesAsync();
@@ -258,13 +239,11 @@ namespace HouseRent.Controllers
             return RedirectToAction("Details", new { id = review.AdvertiseID });
         }
 
-        //this function is to compliment
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DoCompliment(Compliment compliment)
         {
             string usr = HttpContext.Session.GetString("sEmail");
-            //this means u cannot review without being logged in
             if (String.IsNullOrEmpty(usr))
             {
                 return RedirectToAction("Login", "Users");
@@ -275,13 +254,11 @@ namespace HouseRent.Controllers
 
             if (Complimented == null)
             {
-                //if user compliment for an advertise for the first time 
                 _context.Add(compliment);
                 await _context.SaveChangesAsync();
             }
             else
             {
-                //if already reviewed it, but want to change review
                 Complimented.Cleanness = compliment.Cleanness;
                 Complimented.Comfort = compliment.Comfort;
                 Complimented.PriceQuality = compliment.PriceQuality;
@@ -293,13 +270,11 @@ namespace HouseRent.Controllers
             return RedirectToAction("Details", new { id = compliment.AdvertiseID });
         }
 
-        //this function is to make a comment
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DoComment([Bind(CmntString)] Comment comment)
         {
             string usr = HttpContext.Session.GetString("sEmail");
-            //this means u cannot comment without being logged in
             if (String.IsNullOrEmpty(usr))
             {
                 return RedirectToAction("Login", "Users");
@@ -312,17 +287,15 @@ namespace HouseRent.Controllers
             return RedirectToAction("Details", new { id = comment.AdvertiseID });
 
         }
-        // Delete a comment
+
         public async Task<IActionResult> DeleteComment(int id)
         {
-            //this means u cannot DeleteComment without being logged in
             if (String.IsNullOrEmpty(HttpContext.Session.GetString("sEmail")))
             {
                 return RedirectToAction("Login", "Users");
             }
             var comment = await _context.Comment.SingleOrDefaultAsync(m => m.ID == id);
 
-            //this means only commenter can only delete his comments
             if (HttpContext.Session.GetString("sEmail") == comment.Commenter)
             {
                 _context.Comment.Remove(comment);
@@ -367,15 +340,12 @@ namespace HouseRent.Controllers
         {
             string tempUser = HttpContext.Session.GetString("sEmail");
 
-            //this means u cannot Create Advertises without being logged in
             if (String.IsNullOrEmpty(tempUser))
             {
                 return RedirectToAction("Login", "Users");
             }
             else
             {
-                //if logged in, user exist or deleted!!
-
                 var userexist = await _context.User.SingleOrDefaultAsync(u => u.Email == tempUser);
                 if (userexist == null)
                 {
@@ -386,15 +356,12 @@ namespace HouseRent.Controllers
         }
 
         // POST: Advertises/Create
-        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
-        // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind(AdString)] Advertise advertise, List<IFormFile> imgs)
         {
             if (ModelState.IsValid)
             {
-                //Here we need to add some values not given by user
                 advertise.PostTime = DateTime.Now;
                 advertise.UserMail = HttpContext.Session.GetString("sEmail");
 
@@ -422,8 +389,7 @@ namespace HouseRent.Controllers
                 }
 
                 _context.Add(advertise);
-                await _context.SaveChangesAsync();  //updated the advertise table
-                //now image table need to update
+                await _context.SaveChangesAsync();
                 foreach (var img in imgs)
                 {
 
@@ -433,18 +399,15 @@ namespace HouseRent.Controllers
                         {
                             img.CopyTo(ms);
                             var fileBytes = ms.ToArray();
-                            //string s = Convert.ToBase64String(fileBytes);
 
                             Image image = new Image();
                             image.AdvertiseID = advertise.ID;
                             image.FlatImage = fileBytes;
                             _context.Add(image);
                             await _context.SaveChangesAsync();
-
-                            // act on the Base64 data
                         }
                     }
-                } //all images updated in image table
+                }
 
                 return RedirectToAction(nameof(Index));
             }
@@ -455,15 +418,12 @@ namespace HouseRent.Controllers
         public async Task<IActionResult> Edit(int? id)
         {
             string tempUser = HttpContext.Session.GetString("sEmail");
-            //this means u cannot Edit Advertises without being logged in
             if (String.IsNullOrEmpty(tempUser))
             {
                 return RedirectToAction("Login", "Users");
             }
             else
             {
-                //if logged in, user exist or deleted!!
-
                 var userexist = await _context.User.SingleOrDefaultAsync(u => u.Email == tempUser);
                 if (userexist == null)
                 {
@@ -482,7 +442,6 @@ namespace HouseRent.Controllers
             }
             else
             {
-                //this means owners only can edit their advertises
                 if (advertise.UserMail != HttpContext.Session.GetString("sEmail"))
                 {
                     return RedirectToAction("Index", "Advertises");
@@ -492,8 +451,6 @@ namespace HouseRent.Controllers
         }
 
         // POST: Advertises/Edit/5
-        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
-        // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind(AdString)] Advertise advertise)
@@ -530,15 +487,12 @@ namespace HouseRent.Controllers
         public async Task<IActionResult> Delete(int? id)
         {
             string tempUser = HttpContext.Session.GetString("sEmail");
-            //this means u cannot load delete page without being logged in
             if (String.IsNullOrEmpty(tempUser))
             {
                 return RedirectToAction("Index", "Home");
             }
             else
             {
-                //if logged in, user exist or deleted!!
-
                 var userexist = await _context.User.SingleOrDefaultAsync(u => u.Email == tempUser);
                 if (userexist == null)
                 {
@@ -558,7 +512,6 @@ namespace HouseRent.Controllers
             }
             else
             {
-                //this means admins and owners can delete an account
                 if (advertise.UserMail != HttpContext.Session.GetString("sEmail")
                     && HttpContext.Session.GetString("sRole") != "admin")
                 {

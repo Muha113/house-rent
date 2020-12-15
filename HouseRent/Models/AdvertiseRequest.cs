@@ -9,8 +9,8 @@ namespace HouseRent.Models
     {
         public static string RequestToPlace = "to_place";
         public static string RequestToBook = "to_book";
-        public static string RequestOrderFrom = "Исходящие";
-        public static string RequestOrderTo = "Входящие";
+        public static string RequestOrderFrom = "Outcoming";
+        public static string RequestOrderTo = "Incoming";
 
         public int ID { get; set; }
 

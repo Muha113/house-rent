@@ -16,9 +16,6 @@ namespace HouseRent.Controllers
             return View();
         }
 
- //return typeof(Controller).Assembly.GetName().Version.ToString();
-
-
         public IActionResult About()
         {
             ViewData["Message"] = "Your application description page.";

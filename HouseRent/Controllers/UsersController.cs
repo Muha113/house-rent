@@ -27,7 +27,6 @@ namespace HouseRent.Controllers
             _config = config;
         }
 
-        //A funtion to return image path from database
         public FileContentResult GetImg(int id)
         {
             var image = _context.User.Find(id).Avatar;
@@ -38,7 +37,6 @@ namespace HouseRent.Controllers
         // GET: Users
         public async Task<IActionResult> Index()
         {
-            //this means only admin can see the user list
             if(HttpContext.Session.GetString("sRole") != "admin")
             {
                 return RedirectToAction("Index", "Home");
@@ -49,7 +47,6 @@ namespace HouseRent.Controllers
 
         public IActionResult Login()
         {
-            //this means u cannot reload login page once u logged in
             if(!String.IsNullOrEmpty(HttpContext.Session.GetString("sEmail")))
             {
                 return RedirectToAction("Index", "Home");
@@ -81,7 +78,6 @@ namespace HouseRent.Controllers
 
         public IActionResult Logout()
         {
-            //all session variables, sets as empty...
             HttpContext.Session.Remove("sName");
             HttpContext.Session.Remove("sEmail");
             HttpContext.Session.Remove("sRole");
@@ -95,7 +91,6 @@ namespace HouseRent.Controllers
         // GET: Users/Details/5
         public async Task<IActionResult> Details(int? id)
         {
-            //this means u cannot load details page without logged in
             if (String.IsNullOrEmpty(HttpContext.Session.GetString("sEmail")))
             {
                 return RedirectToAction("Index", "Home");
@@ -113,7 +108,6 @@ namespace HouseRent.Controllers
             }
             else
             {
-                //this means admins and owners only can see their account details
                 if(user.Email != HttpContext.Session.GetString("sEmail")
                     && HttpContext.Session.GetString("sRole") != "admin")
                 {
@@ -127,7 +121,6 @@ namespace HouseRent.Controllers
         // GET: Users/Create
         public IActionResult Create()
         {
-            //this means u cannot load create/signup page once u logged in
             if (!String.IsNullOrEmpty(HttpContext.Session.GetString("sEmail")))
             {
                 return RedirectToAction("Index", "Home");
@@ -135,7 +128,7 @@ namespace HouseRent.Controllers
             return View();
         }
 
-        // POST: Users/Create  (Used for sign up)
+        // POST: Users/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind(userString)] User user, IFormFile img)
@@ -144,7 +137,6 @@ namespace HouseRent.Controllers
             {
                 try
                 {
-                    //for image : if given an image or not
                     if(img != null)
                     {
                         if (img.Length > 0)
@@ -158,7 +150,7 @@ namespace HouseRent.Controllers
                         }
                     }
                     
-                    user.Role = "normal"; //others user are either admin or banned
+                    user.Role = "normal";
                     _context.Add(user);
                     await _context.SaveChangesAsync();
                     HttpContext.Session.SetString("sName", user.Name);
@@ -187,7 +179,6 @@ namespace HouseRent.Controllers
         // GET: Users/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
-            //this means u cannot load edit page without logged in
             if (String.IsNullOrEmpty(HttpContext.Session.GetString("sEmail")))
             {
                 return RedirectToAction("Index", "Home");
@@ -204,7 +195,6 @@ namespace HouseRent.Controllers
             }
             else
             {
-                //this means owners only can edit their account details
                 if (user.Email != HttpContext.Session.GetString("sEmail"))
                 {
                     return RedirectToAction("Index", "Home");
@@ -214,8 +204,6 @@ namespace HouseRent.Controllers
         }
 
         // POST: Users/Edit/5
-        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
-        // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind(userString)] User user)
@@ -251,7 +239,6 @@ namespace HouseRent.Controllers
         // GET: Users/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
-            //this means u cannot load delete page without logged in
             if (String.IsNullOrEmpty(HttpContext.Session.GetString("sEmail")))
             {
                 return RedirectToAction("Index", "Home");
@@ -269,7 +256,6 @@ namespace HouseRent.Controllers
             }
             else
             {
-                //this means admins and owners can delete an account
                 if (user.Email != HttpContext.Session.GetString("sEmail")
                     && HttpContext.Session.GetString("sRole") != "admin")
                 {
@@ -289,7 +275,6 @@ namespace HouseRent.Controllers
             _context.User.Remove(user);
             await _context.SaveChangesAsync();
 
-            //if the owner deletes his account, he will be logged out
             if(HttpContext.Session.GetString("sEmail") == user.Email)
             {
                 return RedirectToAction(nameof(Logout));
